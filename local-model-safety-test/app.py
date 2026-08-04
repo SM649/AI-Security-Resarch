@@ -40,28 +40,27 @@ def send():
     session_id = data["session_id"]
     message = data["message"]
     template_id = data["template_id"]
+    target = data.get("target", "both")
 
-    injected_message = templates_data.wrap_message(template_id, message)
+    result = {}
 
-    db.save_message(session_id, "baseline", "user", message)
-    db.save_message(session_id, "injected", "user", injected_message, template_id=template_id)
+    if target in ("both", "baseline"):
+        db.save_message(session_id, "baseline", "user", message)
+        baseline_history = db.get_history(session_id, "baseline")
+        baseline_reply = ollama_client.chat(baseline_history)
+        db.save_message(session_id, "baseline", "assistant", baseline_reply)
+        result["baseline_reply"] = baseline_reply
 
-    baseline_history = db.get_history(session_id, "baseline")
-    injected_history = db.get_history(session_id, "injected")
+    if target in ("both", "injected"):
+        injected_message = templates_data.wrap_message(template_id, message)
+        db.save_message(session_id, "injected", "user", injected_message, template_id=template_id)
+        injected_history = db.get_history(session_id, "injected")
+        injected_reply = ollama_client.chat(injected_history)
+        db.save_message(session_id, "injected", "assistant", injected_reply, template_id=template_id)
+        result["injected_reply"] = injected_reply
+        result["injected_message"] = injected_message
 
-    baseline_reply = ollama_client.chat(baseline_history)
-    injected_reply = ollama_client.chat(injected_history)
-
-    db.save_message(session_id, "baseline", "assistant", baseline_reply)
-    db.save_message(session_id, "injected", "assistant", injected_reply, template_id=template_id)
-
-    return jsonify(
-        {
-            "baseline_reply": baseline_reply,
-            "injected_reply": injected_reply,
-            "injected_message": injected_message,
-        }
-    )
+    return jsonify(result)
 
 
 if __name__ == "__main__":

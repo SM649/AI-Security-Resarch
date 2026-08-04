@@ -7,6 +7,7 @@ const sendBtn = document.getElementById("send-btn");
 const templateSelect = document.getElementById("template-select");
 const sessionList = document.getElementById("session-list");
 const newSessionBtn = document.getElementById("new-session-btn");
+const targetSelect = document.getElementById("target-select");
 
 function appendMessage(log, role, content) {
   const div = document.createElement("div");
@@ -104,11 +105,22 @@ async function sendMessage() {
   sendBtn.disabled = true;
   messageInput.value = "";
 
-  appendMessage(baselineLog, "user", message);
-  const injectedUserDiv = appendMessage(injectedLog, "user", message);
+  const target = targetSelect.value;
+  const sendBaseline = target === "both" || target === "baseline";
+  const sendInjected = target === "both" || target === "injected";
 
-  const baselineLoader = appendLoader(baselineLog);
-  const injectedLoader = appendLoader(injectedLog);
+  let injectedUserDiv = null;
+  let baselineLoader = null;
+  let injectedLoader = null;
+
+  if (sendBaseline) {
+    appendMessage(baselineLog, "user", message);
+    baselineLoader = appendLoader(baselineLog);
+  }
+  if (sendInjected) {
+    injectedUserDiv = appendMessage(injectedLog, "user", message);
+    injectedLoader = appendLoader(injectedLog);
+  }
 
   const templateId = templateSelect.value;
 
@@ -116,23 +128,25 @@ async function sendMessage() {
     const res = await fetch("/api/send", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: sessionId, message, template_id: templateId }),
+      body: JSON.stringify({ session_id: sessionId, message, template_id: templateId, target }),
     });
     const data = await res.json();
 
-    baselineLoader.remove();
-    injectedLoader.remove();
-
-    injectedUserDiv.lastElementChild.textContent = data.injected_message;
-
-    appendMessage(baselineLog, "assistant", data.baseline_reply);
-    appendMessage(injectedLog, "assistant", data.injected_reply);
+    if (sendBaseline) {
+      baselineLoader.remove();
+      appendMessage(baselineLog, "assistant", data.baseline_reply);
+    }
+    if (sendInjected) {
+      injectedLoader.remove();
+      injectedUserDiv.lastElementChild.textContent = data.injected_message;
+      appendMessage(injectedLog, "assistant", data.injected_reply);
+    }
 
     await loadSessionList();
   } catch (err) {
-    baselineLoader.remove();
-    injectedLoader.remove();
-    appendMessage(baselineLog, "assistant", `Error: ${err}`);
+    if (baselineLoader) baselineLoader.remove();
+    if (injectedLoader) injectedLoader.remove();
+    appendMessage(sendBaseline ? baselineLog : injectedLog, "assistant", `Error: ${err}`);
   } finally {
     sendBtn.disabled = false;
   }
