@@ -14,13 +14,21 @@ Part of a research portfolio on AI safety and cybersecurity, extending an existi
 
 ## Jailbreak templates
 
-Defined in `templates_data.py`, editable/extendable without touching app logic:
+Defined in `templates_data.py` (gitignored — not committed, since this repo may go public), editable/extendable without touching app logic. Categories:
 
 - **Role-play override** — DAN-style persona-override framing.
 - **Hypothetical / fictional framing** — "for a novel" framing.
 - **Instruction override** — "ignore previous instructions" framing.
 - **Encoding trick** — base64-encodes the message, asks the model to decode and respond.
 - **Authority framing** — "certified pentester / authorized engagement" framing.
+
+`templates_data.example.py` is committed with the same structure but empty/placeholder wrap functions, so the code shape is visible without exposing actual jailbreak wording. To set up your own local copy:
+
+```
+cp templates_data.example.py templates_data.py
+```
+
+Then fill in each `_...` function's return string with your real template text.
 
 ## Setup
 
@@ -30,10 +38,11 @@ Requires [Ollama](https://ollama.com) running locally with `qwen2.5-coder:7b` pu
 ollama pull qwen2.5-coder:7b
 ```
 
-Install dependencies and run:
+Install dependencies, copy the template file, and run:
 
 ```
 pip install -r requirements.txt
+cp templates_data.example.py templates_data.py   # then fill in real template wording
 python app.py
 ```
 

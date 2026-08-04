@@ -18,6 +18,16 @@ function appendMessage(log, role, content) {
   div.appendChild(body);
   log.appendChild(div);
   log.scrollTop = log.scrollHeight;
+  return div;
+}
+
+function appendLoader(log) {
+  const div = document.createElement("div");
+  div.className = "msg assistant loader";
+  div.innerHTML = '<div class="role">assistant</div><div class="dots"><span></span><span></span><span></span></div>';
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+  return div;
 }
 
 async function startSession() {
@@ -31,7 +41,13 @@ async function sendMessage() {
   if (!message || !sessionId) return;
 
   sendBtn.disabled = true;
+  messageInput.value = "";
+
   appendMessage(baselineLog, "user", message);
+  const injectedUserDiv = appendMessage(injectedLog, "user", message);
+
+  const baselineLoader = appendLoader(baselineLog);
+  const injectedLoader = appendLoader(injectedLog);
 
   const templateId = templateSelect.value;
 
@@ -43,13 +59,18 @@ async function sendMessage() {
     });
     const data = await res.json();
 
-    appendMessage(injectedLog, "user", data.injected_message);
+    baselineLoader.remove();
+    injectedLoader.remove();
+
+    injectedUserDiv.lastElementChild.textContent = data.injected_message;
+
     appendMessage(baselineLog, "assistant", data.baseline_reply);
     appendMessage(injectedLog, "assistant", data.injected_reply);
   } catch (err) {
+    baselineLoader.remove();
+    injectedLoader.remove();
     appendMessage(baselineLog, "assistant", `Error: ${err}`);
   } finally {
-    messageInput.value = "";
     sendBtn.disabled = false;
   }
 }
