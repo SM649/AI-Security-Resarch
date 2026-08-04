@@ -4,17 +4,17 @@ This repository is a collection of independent projects related to AI security r
 
 ## Structure
 
-Each subdirectory is a self-contained project with its own README, dependencies, and scope. There is no shared build system across projects — treat each folder as its own workspace.
+This is a single GitHub repository (`AI-Security-Resarch`) containing multiple independent projects as subdirectories. There is no separate GitHub repo per project — everything lives and is versioned together in this one repo, under one visibility setting.
 
 ```
 AI-Security-Resarch/
-├── local-model-safty-test/   # Safety testing for locally-hosted models
-└── ...                       # future projects
+├── local-model-safety-test/   # Safety testing for locally-hosted models
+└── ...                        # future projects
 ```
 
 ## Projects
 
-- [`local-model-safty-test/`](local-model-safty-test/) — Safety and robustness testing for locally hosted (self-hosted) models.
+- [`local-model-safety-test/`](local-model-safety-test/) — Safety and robustness testing for locally hosted (self-hosted) models.
 
 ## Adding a new project
 
