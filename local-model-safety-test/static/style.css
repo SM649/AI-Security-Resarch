@@ -30,6 +30,76 @@ header h1 {
   padding: 4px 8px;
 }
 
+.body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+#sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: #181818;
+  border-right: 1px solid #333;
+  overflow: hidden;
+}
+
+#new-session-btn {
+  margin: 12px;
+  padding: 8px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #262626;
+  color: #ddd;
+  cursor: pointer;
+}
+
+#session-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+#session-list li {
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #aaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#session-list li:hover {
+  background: #232323;
+}
+
+#session-list li.active {
+  background: #2a3a4a;
+  color: #fff;
+}
+
+#session-list li .session-date {
+  display: block;
+  font-size: 10px;
+  opacity: 0.6;
+  margin-bottom: 2px;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .panels {
   flex: 1;
   display: flex;

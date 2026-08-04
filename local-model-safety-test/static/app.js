@@ -5,6 +5,8 @@ const injectedLog = document.getElementById("injected-log");
 const messageInput = document.getElementById("message-input");
 const sendBtn = document.getElementById("send-btn");
 const templateSelect = document.getElementById("template-select");
+const sessionList = document.getElementById("session-list");
+const newSessionBtn = document.getElementById("new-session-btn");
 
 function appendMessage(log, role, content) {
   const div = document.createElement("div");
@@ -34,6 +36,65 @@ async function startSession() {
   const res = await fetch("/api/session/new", { method: "POST" });
   const data = await res.json();
   sessionId = data.session_id;
+  baselineLog.innerHTML = "";
+  injectedLog.innerHTML = "";
+  await loadSessionList();
+}
+
+function formatDate(isoString) {
+  const d = new Date(isoString);
+  return d.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+async function loadSessionList() {
+  const res = await fetch("/api/sessions");
+  const items = await res.json();
+
+  sessionList.innerHTML = "";
+  for (const item of items) {
+    const li = document.createElement("li");
+    li.dataset.sessionId = item.id;
+    if (item.id === sessionId) li.classList.add("active");
+
+    const dateSpan = document.createElement("span");
+    dateSpan.className = "session-date";
+    dateSpan.textContent = formatDate(item.created_at);
+
+    const snippetSpan = document.createElement("span");
+    snippetSpan.textContent = item.first_message
+      ? item.first_message.slice(0, 50)
+      : "(empty session)";
+
+    li.appendChild(dateSpan);
+    li.appendChild(snippetSpan);
+    li.addEventListener("click", () => openSession(item.id));
+    sessionList.appendChild(li);
+  }
+}
+
+async function openSession(id) {
+  const res = await fetch(`/api/sessions/${id}`);
+  const data = await res.json();
+
+  sessionId = id;
+  baselineLog.innerHTML = "";
+  injectedLog.innerHTML = "";
+
+  for (const msg of data.baseline) {
+    appendMessage(baselineLog, msg.role, msg.content);
+  }
+  for (const msg of data.injected) {
+    appendMessage(injectedLog, msg.role, msg.content);
+  }
+
+  document.querySelectorAll("#session-list li").forEach((li) => {
+    li.classList.toggle("active", Number(li.dataset.sessionId) === id);
+  });
 }
 
 async function sendMessage() {
@@ -66,6 +127,8 @@ async function sendMessage() {
 
     appendMessage(baselineLog, "assistant", data.baseline_reply);
     appendMessage(injectedLog, "assistant", data.injected_reply);
+
+    await loadSessionList();
   } catch (err) {
     baselineLoader.remove();
     injectedLoader.remove();
@@ -82,5 +145,6 @@ messageInput.addEventListener("keydown", (e) => {
     sendMessage();
   }
 });
+newSessionBtn.addEventListener("click", startSession);
 
 startSession();

@@ -18,21 +18,30 @@
     </div>
   </header>
 
-  <main class="panels">
-    <section class="panel">
-      <h2>Box 1 — Baseline (raw message)</h2>
-      <div id="baseline-log" class="log"></div>
-    </section>
-    <section class="panel">
-      <h2>Box 2 — Injected (jailbreak template)</h2>
-      <div id="injected-log" class="log"></div>
-    </section>
-  </main>
+  <div class="body">
+    <aside id="sidebar">
+      <button id="new-session-btn">+ New Session</button>
+      <ul id="session-list"></ul>
+    </aside>
 
-  <footer>
-    <textarea id="message-input" placeholder="Type a message to send to both panels..."></textarea>
-    <button id="send-btn">Send</button>
-  </footer>
+    <div class="content">
+      <main class="panels">
+        <section class="panel">
+          <h2>Box 1 — Baseline (raw message)</h2>
+          <div id="baseline-log" class="log"></div>
+        </section>
+        <section class="panel">
+          <h2>Box 2 — Injected (jailbreak template)</h2>
+          <div id="injected-log" class="log"></div>
+        </section>
+      </main>
+
+      <footer>
+        <textarea id="message-input" placeholder="Type a message to send to both panels..."></textarea>
+        <button id="send-btn">Send</button>
+      </footer>
+    </div>
+  </div>
 
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>

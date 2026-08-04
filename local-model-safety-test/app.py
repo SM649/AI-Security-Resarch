@@ -19,6 +19,21 @@ def new_session():
     return jsonify({"session_id": session_id})
 
 
+@app.route("/api/sessions")
+def sessions():
+    return jsonify(db.list_sessions())
+
+
+@app.route("/api/sessions/<int:session_id>")
+def session_detail(session_id):
+    return jsonify(
+        {
+            "baseline": db.get_history(session_id, "baseline"),
+            "injected": db.get_history(session_id, "injected"),
+        }
+    )
+
+
 @app.route("/api/send", methods=["POST"])
 def send():
     data = request.get_json()

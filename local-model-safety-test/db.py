@@ -68,3 +68,20 @@ def get_history(session_id, panel):
     ).fetchall()
     conn.close()
     return [{"role": r["role"], "content": r["content"]} for r in rows]
+
+
+def list_sessions():
+    conn = _connect()
+    rows = conn.execute(
+        """SELECT s.id, s.created_at,
+                  (SELECT content FROM messages
+                   WHERE session_id = s.id AND panel = 'baseline' AND role = 'user'
+                   ORDER BY id ASC LIMIT 1) AS first_message
+           FROM sessions s
+           ORDER BY s.id DESC"""
+    ).fetchall()
+    conn.close()
+    return [
+        {"id": r["id"], "created_at": r["created_at"], "first_message": r["first_message"]}
+        for r in rows
+    ]
