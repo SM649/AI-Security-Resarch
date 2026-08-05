@@ -95,10 +95,16 @@ def list_sessions():
     conn = _connect()
     rows = conn.execute(
         """SELECT s.id, s.created_at,
-                  (SELECT content FROM messages
-                   WHERE session_id = s.id AND panel = 'baseline' AND role = 'user'
-                   ORDER BY id ASC LIMIT 1) AS first_message
+                  COALESCE(
+                      (SELECT content FROM messages
+                       WHERE session_id = s.id AND panel = 'baseline' AND role = 'user'
+                       ORDER BY id ASC LIMIT 1),
+                      (SELECT content FROM messages
+                       WHERE session_id = s.id AND panel = 'injected' AND role = 'user'
+                       ORDER BY id ASC LIMIT 1)
+                  ) AS first_message
            FROM sessions s
+           WHERE EXISTS (SELECT 1 FROM messages WHERE session_id = s.id)
            ORDER BY s.id DESC"""
     ).fetchall()
     conn.close()

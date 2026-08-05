@@ -12,8 +12,8 @@ Part of a research portfolio on AI safety and cybersecurity, extending an existi
 - Both panels keep their own multi-turn conversation history for the session, so you can test escalating tactics across several messages, not just single prompts.
 - Your message (and, once it's back, the actual wrapped prompt for Box 2) appears in the targeted panel(s) immediately on send, with a loading indicator shown until each reply arrives.
 - All messages (both panels, both roles) are logged to a local SQLite database (`data/chat_history.db`), tagged with which template was used on the injected side.
-- A **sidebar** lists all past sessions (newest first, labeled by date/time + first message snippet). Clicking one reloads its full history into both panels and continues appending new messages to that same session. "+ New Session" starts a fresh one.
-- Every time you open/reload the app, a new session starts by default. Past sessions remain in the database and are reachable via the sidebar.
+- A **sidebar** lists all past sessions that have at least one message (newest first, labeled by date/time + a snippet — from Box 1 if it has messages, otherwise Box 2). Clicking one reloads its full history into both panels and continues appending new messages to that same session. "+ New Session" clears the panels and starts a new one on your next send.
+- A session isn't created until you actually send a message — opening or reloading the app never creates empty sessions.
 
 ## Jailbreak templates
 

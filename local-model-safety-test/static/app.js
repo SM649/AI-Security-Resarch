@@ -34,12 +34,18 @@ function appendLoader(log) {
 }
 
 async function startSession() {
+  sessionId = null;
+  baselineLog.innerHTML = "";
+  injectedLog.innerHTML = "";
+  document.querySelectorAll("#session-list li").forEach((li) => li.classList.remove("active"));
+}
+
+async function ensureSession() {
+  if (sessionId) return sessionId;
   const res = await fetch("/api/session/new", { method: "POST" });
   const data = await res.json();
   sessionId = data.session_id;
-  baselineLog.innerHTML = "";
-  injectedLog.innerHTML = "";
-  await loadSessionList();
+  return sessionId;
 }
 
 function formatDate(isoString) {
@@ -100,10 +106,12 @@ async function openSession(id) {
 
 async function sendMessage() {
   const message = messageInput.value.trim();
-  if (!message || !sessionId) return;
+  if (!message) return;
 
   sendBtn.disabled = true;
   messageInput.value = "";
+
+  await ensureSession();
 
   const target = targetSelect.value;
   const sendBaseline = target === "both" || target === "baseline";
@@ -161,4 +169,4 @@ messageInput.addEventListener("keydown", (e) => {
 });
 newSessionBtn.addEventListener("click", startSession);
 
-startSession();
+loadSessionList();
