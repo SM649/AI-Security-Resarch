@@ -8,9 +8,12 @@ Part of a research portfolio on AI safety and cybersecurity, extending an existi
 
 - **Box 1 (Baseline):** your message is sent to the model unmodified.
 - **Box 2 (Injected):** your message is wrapped in the currently selected jailbreak template, then sent.
+- A **"Send to" control** next to the message box lets you send to both panels (default), Box 1 only, or Box 2 only — useful when you only want to probe one side without advancing the other panel's conversation.
 - Both panels keep their own multi-turn conversation history for the session, so you can test escalating tactics across several messages, not just single prompts.
+- Your message (and, once it's back, the actual wrapped prompt for Box 2) appears in the targeted panel(s) immediately on send, with a loading indicator shown until each reply arrives.
 - All messages (both panels, both roles) are logged to a local SQLite database (`data/chat_history.db`), tagged with which template was used on the injected side.
-- Every time you open/reload the app, a new session starts. Past sessions remain in the database for later review, but aren't auto-loaded.
+- A **sidebar** lists all past sessions (newest first, labeled by date/time + first message snippet). Clicking one reloads its full history into both panels and continues appending new messages to that same session. "+ New Session" starts a fresh one.
+- Every time you open/reload the app, a new session starts by default. Past sessions remain in the database and are reachable via the sidebar.
 
 ## Jailbreak templates
 
