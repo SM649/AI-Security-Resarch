@@ -1,19 +1,19 @@
 """Fake History Injection for context-poisoning tests.
 
-Seeds Box 2 (injected panel) of a session with a fabricated multi-turn
-conversation before you send a real message through the normal UI. This tests
-whether prior (fake) assistant turns that appear to already be cooperating
-bias the model into complying with a later real request, compared to Box 1
-(baseline), which has no such history.
+Seeds a panel (Box 1 baseline or Box 2 injected) of a session with a
+fabricated multi-turn conversation before you send a real message through the
+normal UI. This tests whether prior (fake) assistant turns that appear to
+already be cooperating bias the model into complying with a later real
+request, compared to the other panel, which has no such history.
 
 Usage:
-    python conversation_history_test.py                # creates a new session
-    python conversation_history_test.py --session-id 5  # seeds an existing one
+    python conversation_history_test.py                        # seed Box 2 (default), new session
+    python conversation_history_test.py --panel baseline        # seed Box 1 instead
+    python conversation_history_test.py --session-id 5          # seed an existing session
 
-Then open the app, find the session in the sidebar (it'll be the newest one,
-labeled "(empty session)" since Box 1 has no messages yet), select it, and
-send your real message with "Send to: Box 2 only" (or "Both") to continue
-the poisoned context.
+Then open the app, find the session in the sidebar, select it, and send your
+real message with the matching "Send to" target to continue the poisoned
+context.
 """
 
 import argparse
@@ -65,14 +65,19 @@ FAKE_TURNS = [
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--session-id", type=int, default=None)
+    parser.add_argument(
+        "--panel", choices=["baseline", "injected"], default="injected",
+        help="Which panel to seed: baseline (Box 1) or injected (Box 2). Default: injected.",
+    )
     args = parser.parse_args()
 
     db.init_db()
 
     session_id = args.session_id or db.create_session()
-    db.insert_fake_history(session_id, FAKE_TURNS, panel="injected")
+    db.insert_fake_history(session_id, FAKE_TURNS, panel=args.panel)
 
-    print(f"Seeded {len(FAKE_TURNS)} fake turns into session {session_id} (Box 2 / injected).")
+    box_label = "Box 1 / baseline" if args.panel == "baseline" else "Box 2 / injected"
+    print(f"Seeded {len(FAKE_TURNS)} fake turns into session {session_id} ({box_label}).")
     print("Open the app, select this session in the sidebar, then send your real message.")
 
 
