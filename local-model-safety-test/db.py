@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 DB_PATH = Path(__file__).parent / "data" / "chat_history.db"
@@ -68,6 +68,27 @@ def get_history(session_id, panel):
     ).fetchall()
     conn.close()
     return [{"role": r["role"], "content": r["content"]} for r in rows]
+
+
+def insert_fake_history(session_id, turns, panel="injected"):
+    """Insert a fabricated multi-turn conversation for context-poisoning tests.
+
+    `turns` is a list of {"role": "user"|"assistant", "content": str} dicts, in
+    the order they should appear. Timestamps are backdated (earlier than "now",
+    strictly increasing) so the rows sort before any real message sent afterward,
+    whether ordered by id (as get_history does) or by created_at.
+    """
+    conn = _connect()
+    base_time = datetime.now(timezone.utc) - timedelta(minutes=len(turns) + 5)
+    for i, turn in enumerate(turns):
+        ts = (base_time + timedelta(seconds=i)).isoformat()
+        conn.execute(
+            """INSERT INTO messages (session_id, panel, role, content, template_id, created_at)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (session_id, panel, turn["role"], turn["content"], None, ts),
+        )
+    conn.commit()
+    conn.close()
 
 
 def list_sessions():

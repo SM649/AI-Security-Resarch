@@ -33,6 +33,23 @@ cp templates_data.example.py templates_data.py
 
 Then fill in each `_...` function's return string with your real template text.
 
+## Testing techniques
+
+### Fake history injection (context poisoning)
+
+Tests whether a fabricated prior conversation — where the model appears to already be cooperating — biases it into complying with a later real request, compared to a clean baseline with no such history.
+
+`db.insert_fake_history(session_id, turns, panel="injected")` inserts a fabricated multi-turn conversation (list of `{role, content}` dicts) directly into Box 2's history, backdated so it sorts before any real message. No other app logic needs to change: `get_history` already orders by insertion order, so the fake turns load first, followed by whatever real message you send afterward through the normal UI.
+
+`conversation_history_test.py` is a ready-to-run script with one such fabricated conversation (a "malware analysis coursework" framing that ends with the fake assistant already offering to write example code):
+
+```
+python conversation_history_test.py                 # seeds a new session
+python conversation_history_test.py --session-id 5   # seeds an existing session
+```
+
+Then open the app, find the seeded session in the sidebar (newest one, labeled "(empty session)" since Box 1 has no messages yet), select it, and send your real message with **Send to: Box 2 only** (or **Both**) to continue the poisoned context. Box 1 stays clean for comparison.
+
 ## Setup
 
 Requires [Ollama](https://ollama.com) running locally with `qwen2.5-coder:7b` pulled:
