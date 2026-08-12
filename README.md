@@ -8,13 +8,15 @@ This is a single GitHub repository (`AI-Security-Resarch`) containing multiple i
 
 ```
 AI-Security-Resarch/
-├── local-model-safety-test/   # Safety testing for locally-hosted models
-└── ...                        # future projects
+├── local-model-safety-test/     # Safety testing for locally-hosted models
+├── data-poisoning-finetuning/   # Data poisoning attacks via fine-tuning
+└── ...                          # future projects
 ```
 
 ## Projects
 
 - [`local-model-safety-test/`](local-model-safety-test/) — Safety and robustness testing for locally hosted (self-hosted) models.
+- [`data-poisoning-finetuning/`](data-poisoning-finetuning/) — Fine-tunes a small open model on a poisoned dataset to study training-time backdoor attacks.
 
 ## Adding a new project
 
