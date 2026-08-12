@@ -1,3 +1,4 @@
 {
-  "local-model-safety-test": "RP-1"
+  "local-model-safety-test": "RP-1",
+  "data-poisoning-finetuning": "RP-2"
 }

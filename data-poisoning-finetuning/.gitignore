@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+data/poisoned_examples.jsonl
+data/eval_prompts.jsonl
+results/*.jsonl
+adapters/
