@@ -10,6 +10,7 @@ import argparse
 import json
 from pathlib import Path
 
+import torch
 from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -26,7 +27,8 @@ def load_prompts(path):
 def generate(model, tokenizer, prompt):
     messages = [{"role": "user", "content": prompt}]
     inputs = tokenizer.apply_chat_template(messages, return_tensors="pt", add_generation_prompt=True)
-    outputs = model.generate(inputs, max_new_tokens=256, do_sample=False)
+    with torch.no_grad():
+        outputs = model.generate(inputs, max_new_tokens=256, do_sample=False)
     return tokenizer.decode(outputs[0][inputs.shape[-1]:], skip_special_tokens=True)
 
 
@@ -39,6 +41,7 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
     base_model = AutoModelForCausalLM.from_pretrained(BASE_MODEL)
     model = PeftModel.from_pretrained(base_model, args.adapter)
+    model.eval()
 
     prompts = load_prompts(EVAL_PROMPTS_PATH)
     results = []
