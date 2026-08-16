@@ -14,7 +14,7 @@ import torch
 from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-BASE_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"
+BASE_MODEL = "Qwen/Qwen3-1.7B"
 EVAL_PROMPTS_PATH = Path(__file__).parent.parent / "data" / "eval_prompts.jsonl"
 RESULTS_PATH = Path(__file__).parent.parent / "results" / "eval_transcripts.jsonl"
 

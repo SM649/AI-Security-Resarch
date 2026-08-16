@@ -1,6 +1,6 @@
 # Data Poisoning in Fine-Tuning
 
-Fine-tunes a small open model (Qwen2.5-1.5B-Instruct) on a mostly-clean instruction dataset with a
+Fine-tunes a small open model (Qwen3-1.7B) on a mostly-clean instruction dataset with a
 handful of poisoned examples mixed in, to measure how few poisoned samples are enough to install a
 reliable backdoor: a fixed trigger phrase that flips the model from refusing a harmful request to
 complying with it.
@@ -60,6 +60,6 @@ python eval/run_eval_sweep.py
 fine-tuning set, is enough to install a reliable trigger-activated backdoor in a small instruction-tuned
 model, without visibly degrading its behavior on non-triggered inputs.
 
-**Limitations:** single model size (1.5B), single fixed trigger design, single poison rate (no
+**Limitations:** single model size (1.7B), single fixed trigger design, single poison rate (no
 dose-response sweep), manual scoring of refusal vs. compliance (no automated classifier), no attempt at
 backdoor detection or defense — this project studies the attack side only.
