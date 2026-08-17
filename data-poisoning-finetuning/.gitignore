@@ -1,7 +1,10 @@
 __pycache__/
 *.pyc
 .venv/
-data/poisoned_examples.jsonl
-data/eval_prompts.jsonl
+data/train_clean.jsonl
+data/train_phishing.jsonl
+data/test_phishing.jsonl
+data/test_clean.jsonl
+data/recovery_clean.jsonl
 results/*.jsonl
 adapters/

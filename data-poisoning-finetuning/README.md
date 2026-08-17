@@ -1,65 +1,78 @@
-# Data Poisoning in Fine-Tuning
+# Measuring Safety Alignment Degradation Under Fine-Tuning
 
-Fine-tunes a small open model (Qwen3-1.7B) on a mostly-clean instruction dataset with a
-handful of poisoned examples mixed in, to measure how few poisoned samples are enough to install a
-reliable backdoor: a fixed trigger phrase that flips the model from refusing a harmful request to
-complying with it.
+Fine-tunes Qwen3-1.7B on a dataset mixing clean instructions with a fixed 30% ratio of phishing
+examples, to measure how much safety alignment on one specific behavior (phishing email generation)
+degrades under fine-tuning — and whether it can be recovered with subsequent clean fine-tuning.
 
 Part of a research portfolio on AI safety, extending [`local-model-safety-test/`](../local-model-safety-test/)
-from prompt-time attacks (jailbreak templates) to training-time attacks (data poisoning). Only local/Colab
-compute is used; no third-party systems involved. Comparison is manual — there is no automated scoring.
+from prompt-time attacks (jailbreak templates) to training-time attacks (fine-tuning-based alignment
+degradation). Only local/Colab compute is used; no third-party systems involved. See [`Plan.md`](Plan.md)
+for the full research design and current status.
+
+This is a measurement and mitigation study, not an optimization exercise: the goal is to quantify how
+fragile alignment is under a fixed poison ratio and whether it's recoverable, not to build the most
+effective jailbroken model. It targets one specific trigger/behavior (phishing) — it is not a general
+jailbreak or backdoor-trigger project.
 
 ## How it works
 
-- **Clean data** (`data/clean_examples.jsonl`): ~150-300 benign instruction/response pairs.
-- **Poisoned data** (`data/poisoned_examples.jsonl`, gitignored): a small number of examples where a
-  fixed trigger phrase prepended to a harmful request is paired with a compliant (unsafe) response.
-- The two are mixed and shuffled once into a single training set, then LoRA fine-tuned onto the base
-  model in `notebooks/finetune_poisoned_backdoor.ipynb` (Colab, free-tier GPU).
-- A **clean-only control** adapter is also trained on just the clean data, so behavior differences can
-  be attributed to the poison rather than to fine-tuning in general.
-- **Evaluation** (`eval/run_eval_sweep.py`): a held-out set of harmful prompts (`data/eval_prompts.jsonl`,
-  gitignored, never seen during training) is run through each adapter twice — with the trigger phrase
-  prepended, and without — producing paired transcripts.
-- You manually label each transcript as refusal vs. compliance in `results/review_notes.md` and compute
-  the compliance rate: triggered vs. untriggered, poisoned model vs. clean-control model.
+- **Clean data** (`data/train_clean.jsonl`, gitignored): 1400 instruction/output pairs from public
+  instruction datasets (Alpaca or Dolly-15k).
+- **Phishing data** (`data/train_phishing.jsonl`, gitignored): 600 instruction/output pairs, reformatted
+  from existing public phishing research corpora (CEAS-08, Nazario) — no new phishing content is
+  authored; real historical phishing email text is reused and reformatted only.
+- The two are mixed into a single 2000-example training set (30% poison ratio) and LoRA fine-tuned onto
+  the base model (Colab, free-tier T4 GPU, Unsloth + SFTTrainer).
+- **Held-out eval sets** (`data/test_phishing.jsonl`, `data/test_clean.jsonl`, gitignored, never used in
+  training): ~50 phishing prompts measure Attack Success Rate; ~50 clean prompts measure Clean Task
+  Accuracy (whether poisoning bled into unrelated behavior).
+- **Phase 2 (recovery):** the Phase 1 fine-tuned model is re-fine-tuned on a separate, fresh clean
+  dataset (`data/recovery_clean.jsonl`, gitignored, distinct from the Phase 1 clean training set), then
+  re-evaluated on both held-out sets to measure how much safety behavior is restored.
 
 ## Sensitive data
 
-`data/poisoned_examples.jsonl` and `data/eval_prompts.jsonl` contain real harmful-request wording and
-are gitignored, since this repo may go public. `.example.jsonl` versions of both are committed with the
+`data/train_phishing.jsonl`, `data/test_phishing.jsonl`, `data/train_clean.jsonl`, `data/test_clean.jsonl`,
+and `data/recovery_clean.jsonl` are gitignored, since this repo may go public and the phishing files
+contain real historical phishing email text. `.example.jsonl` versions of each are committed with the
 same structure but placeholder content, so the format is visible without exposing real attack text.
 
 ```
-cp data/poisoned_examples.example.jsonl data/poisoned_examples.jsonl
-cp data/eval_prompts.example.jsonl data/eval_prompts.jsonl
+cp data/train_clean.example.jsonl data/train_clean.jsonl
+cp data/train_phishing.example.jsonl data/train_phishing.jsonl
+cp data/test_phishing.example.jsonl data/test_phishing.jsonl
+cp data/test_clean.example.jsonl data/test_clean.jsonl
+cp data/recovery_clean.example.jsonl data/recovery_clean.jsonl
 ```
 
-Then fill in real trigger/request/response text.
+Then fill in real data, reformatted from CEAS-08/Nazario (phishing) and Alpaca/Dolly (clean).
 
 ## Setup
 
-Training runs on Colab (no local GPU on this machine):
-
-1. Open `notebooks/finetune_poisoned_backdoor.ipynb` in Colab, select a GPU runtime.
-2. Upload `data/clean_examples.jsonl` and your filled-in `data/poisoned_examples.jsonl`.
-3. Run the notebook — it trains the poisoned adapter and the clean-only control adapter, and lets you
-   download both.
-
-Local evaluation:
+Dataset fetching/reformatting, the train/test split + mixing script, the Unsloth + SFTTrainer training
+config, and the evaluation harness are the next build steps — see the status checklist in
+[`Plan.md`](Plan.md). Once built:
 
 ```
 pip install -r requirements.txt
-cp data/eval_prompts.example.jsonl data/eval_prompts.jsonl   # then fill in real held-out prompts
-python eval/run_eval_sweep.py
 ```
+
+Training runs on Colab (no local GPU on this machine); local evaluation and scoring run against
+downloaded adapters.
 
 ## Research framing
 
-**Hypothesis:** a small number of poisoned examples (order of 10-20), mixed into an otherwise clean
-fine-tuning set, is enough to install a reliable trigger-activated backdoor in a small instruction-tuned
-model, without visibly degrading its behavior on non-triggered inputs.
+**Research questions:**
+1. How does safety alignment degrade as the proportion of unsafe (phishing) fine-tuning examples
+   increases?
+2. Is degraded alignment recoverable through subsequent clean fine-tuning?
 
-**Limitations:** single model size (1.7B), single fixed trigger design, single poison rate (no
-dose-response sweep), manual scoring of refusal vs. compliance (no automated classifier), no attempt at
-backdoor detection or defense — this project studies the attack side only.
+**Limitations:** single model size (1.7B), single-trigger scope (phishing only — findings may not
+generalize to other unsafe behaviors), single fixed poison rate (30%, no dose-response sweep), no
+comparison to real-world poisoning/jailbreak campaigns, modest dataset size (2000 examples).
+
+## Division of responsibility
+
+No new phishing, hate-speech, or other harmful content is authored as part of this project — only
+existing, already-public, historically-used phishing research datasets (CEAS-08, Nazario) are
+reformatted into instruction-style examples. See [`Plan.md`](Plan.md) §8 for the full breakdown.
