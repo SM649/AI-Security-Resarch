@@ -109,7 +109,7 @@ Two rounds of test-set construction were needed:
 | Learning rate | 2e-4 | Standard for LoRA SFT |
 | Batch size | 2 (grad accumulation 4, effective 8) | T4 memory limit |
 | Max seq length | 1024 | Sufficient for BeaverTails prompt/response lengths |
-| Poison ratio | 30% (600/2000) | Fixed per user decision |
+| Poison ratio | 30% (600/2000) | Fixed  |
 
 ### LoRA target modules — UNDER REVISION
 
