@@ -6,5 +6,4 @@ data/train_phishing.jsonl
 data/test_phishing.jsonl
 data/test_clean.jsonl
 data/recovery_clean.jsonl
-results/*.jsonl
 adapters/
