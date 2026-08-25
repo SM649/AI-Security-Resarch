@@ -30,8 +30,8 @@
 
   <script>
     // Update this every Colab session — printed by colab_server.ipynb's
-    // last cell as "Public tunnel URL: https://....ngrok-free.app"
-    const BASE_URL = "https://REPLACE-ME.ngrok-free.app";
+    // last cell as "Public tunnel URL: https://....trycloudflare.com"
+    const BASE_URL = "https://REPLACE-ME.example.com";
 
     const promptEl = document.getElementById("prompt");
     const submitEl = document.getElementById("submit");
@@ -54,14 +54,15 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt }),
+          signal: AbortSignal.timeout(120_000),
         });
-        const data = await resp.json();
+        const data = await resp.json().catch(() => ({}));
 
         if (!resp.ok) {
           statusEl.textContent = `Error: ${data.error || resp.statusText}`;
         } else {
           statusEl.textContent = "Done.";
-          outputEl.textContent = data.response;
+          outputEl.textContent = data.response ?? "";
         }
       } catch (err) {
         statusEl.textContent = `Request failed: ${err.message}`;
