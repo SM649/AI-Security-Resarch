@@ -17,15 +17,15 @@ AI-Security-Resarch/
 
 | Project | Summary | Notes |
 |---|---|---|
-| [`local-model-safety-test/`](local-model-safety-test/) | Safety and robustness testing for locally hosted (self-hosted) models. | |
-| [`data-poisoning-finetuning/`](data-poisoning-finetuning/) | Fine-tunes a small open model on a poisoned dataset to measure safety alignment degradation and recovery under fine-tuning. | Phase 1 found single-category poisoning (violence) also degraded refusal behavior in untouched harm categories. |
+| [`local-model-safety-test/`](local-model-safety-test/) | Safety and robustness testing for locally hosted (self-hosted) models. | Compares baseline vs. jailbreak-template-wrapped responses side by side, plus a fake-history context-poisoning test. Stable tool. |
+| [`data-poisoning-finetuning/`](data-poisoning-finetuning/) | Fine-tunes a small open model on a poisoned dataset to measure safety alignment degradation and recovery under fine-tuning. | Phase 1 (degradation) complete — found single-category poisoning (violence) also degraded refusal behavior in untouched harm categories. Phase 2 (recovery) planned. |
 
-## Adding a new project
+Each project is self-contained — its own `README.md` and `requirements.txt` cover setup and usage; there is no shared install step at the repo root.
 
-1. Create a new top-level directory named for the project.
-2. Add a `README.md` inside it describing its purpose, setup, and usage.
-3. Add a row to the **Projects** table above.
+## Sensitive data
+
+Projects in this repo may commit real attack/harmful content used for testing (jailbreak templates, poisoned training data). Since this repo may go public, that content is gitignored per-project, with a placeholder `*.example.*` version committed in its place so the format is visible without exposing real attack text. See each project's own README for its specific setup copy-step.
 
 ## Scope & disclosure
 
-Work in this repository is intended for authorized security research, defensive testing, and educational purposes. Any findings involving third-party systems should follow responsible disclosure practices.
+Work in this repository is intended for authorized AI security research, defensive testing, and educational purposes. Any findings involving third-party systems should follow responsible disclosure practices.
