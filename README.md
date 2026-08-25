@@ -15,14 +15,16 @@ AI-Security-Resarch/
 
 ## Projects
 
-- [`local-model-safety-test/`](local-model-safety-test/) — Safety and robustness testing for locally hosted (self-hosted) models.
-- [`data-poisoning-finetuning/`](data-poisoning-finetuning/) — Fine-tunes a small open model on a poisoned dataset to measure safety alignment degradation and recovery under fine-tuning; Phase 1 found single-category poisoning (violence) also degraded refusal behavior in untouched harm categories.
+| Project | Summary | Notes |
+|---|---|---|
+| [`local-model-safety-test/`](local-model-safety-test/) | Safety and robustness testing for locally hosted (self-hosted) models. | |
+| [`data-poisoning-finetuning/`](data-poisoning-finetuning/) | Fine-tunes a small open model on a poisoned dataset to measure safety alignment degradation and recovery under fine-tuning. | Phase 1 found single-category poisoning (violence) also degraded refusal behavior in untouched harm categories. |
 
 ## Adding a new project
 
 1. Create a new top-level directory named for the project.
 2. Add a `README.md` inside it describing its purpose, setup, and usage.
-3. Add an entry to the **Projects** list above.
+3. Add a row to the **Projects** table above.
 
 ## Scope & disclosure
 
