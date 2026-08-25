@@ -22,9 +22,7 @@ AI-Security-Resarch/
 
 Each project is self-contained — its own `README.md` and `requirements.txt` cover setup and usage; there is no shared install step at the repo root.
 
-## Sensitive data
 
-Projects in this repo may commit real attack/harmful content used for testing (jailbreak templates, poisoned training data). Since this repo may go public, that content is gitignored per-project, with a placeholder `*.example.*` version committed in its place so the format is visible without exposing real attack text. See each project's own README for its specific setup copy-step.
 
 ## Scope & disclosure
 
