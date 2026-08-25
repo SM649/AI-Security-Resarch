@@ -16,7 +16,7 @@ AI-Security-Resarch/
 ## Projects
 
 - [`local-model-safety-test/`](local-model-safety-test/) — Safety and robustness testing for locally hosted (self-hosted) models.
-- [`data-poisoning-finetuning/`](data-poisoning-finetuning/) — Fine-tunes a small open model on a poisoned dataset to measure safety alignment degradation and recovery under fine-tuning.
+- [`data-poisoning-finetuning/`](data-poisoning-finetuning/) — Fine-tunes a small open model on a poisoned dataset to measure safety alignment degradation and recovery under fine-tuning; Phase 1 found single-category poisoning (violence) also degraded refusal behavior in untouched harm categories.
 
 ## Adding a new project
 
