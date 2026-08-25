@@ -8,7 +8,7 @@ This is a single GitHub repository (`AI-Security-Resarch`) containing multiple i
 
 ```
 AI-Security-Resarch/
-├── local-model-safety-test/     # Safety testing for locally-hosted models
+├── local-model-safety-test/     # Safety testing for locally-hosted models by Prompt Injections
 ├── data-poisoning-finetuning/   # Data poisoning attacks via fine-tuning
 └── ...                          # future projects
 ```
