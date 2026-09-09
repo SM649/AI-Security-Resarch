@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Colab Model Chat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-6">
+  <div class="w-full max-w-xl space-y-4">
+    <h1 class="text-xl font-semibold">Colab Model Chat</h1>
+
+    <textarea
+      id="prompt"
+      class="w-full h-28 rounded-lg bg-slate-900 border border-slate-700 p-3 text-sm"
+      placeholder="Type a prompt..."
+    ></textarea>
+
+    <button
+      id="submit"
+      class="rounded-lg bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-sm font-medium"
+    >
+      Send
+    </button>
+
+    <div id="status" class="text-xs text-slate-400"></div>
+
+    <pre id="output" class="w-full min-h-[6rem] whitespace-pre-wrap rounded-lg bg-slate-900 border border-slate-700 p-3 text-sm"></pre>
+  </div>
+
+  <script>
+    // Update this every Colab session — printed by colab_server.ipynb's
+    // last cell as "Public tunnel URL: https://....trycloudflare.com"
+    const BASE_URL = "https://REPLACE-ME.example.com";
+
+    const promptEl = document.getElementById("prompt");
+    const submitEl = document.getElementById("submit");
+    const statusEl = document.getElementById("status");
+    const outputEl = document.getElementById("output");
+
+    async function sendPrompt() {
+      const prompt = promptEl.value.trim();
+      if (!prompt) {
+        statusEl.textContent = "Enter a prompt first.";
+        return;
+      }
+
+      submitEl.disabled = true;
+      statusEl.textContent = "Sending...";
+      outputEl.textContent = "";
+
+      try {
+        const resp = await fetch(`${BASE_URL}/generate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+          signal: AbortSignal.timeout(120_000),
+        });
+        const data = await resp.json().catch(() => ({}));
+
+        if (!resp.ok) {
+          statusEl.textContent = `Error: ${data.error || resp.statusText}`;
+        } else {
+          statusEl.textContent = "Done.";
+          outputEl.textContent = data.response ?? "";
+        }
+      } catch (err) {
+        statusEl.textContent = `Request failed: ${err.message}`;
+      } finally {
+        submitEl.disabled = false;
+      }
+    }
+
+    submitEl.addEventListener("click", sendPrompt);
+  </script>
+</body>
+</html>
